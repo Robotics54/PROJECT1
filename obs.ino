@@ -1,3 +1,10 @@
+#include <Servo.h>
+
+int servoPin = 12;
+ 
+Servo servo;  
+ 
+int servoAngle = 0; 
 
 const int trig = 2;
 const int echo = 4;
@@ -6,15 +13,15 @@ const int leftBackward = 6;
 const int rightForward = 10;
 const int rightBackward = 9;
 int input;
-String text="";
 
 int duration = 0;
 int distance = 0;
 
 void setup() 
 {
-  pinMode(trig , OUTPUT);
-  pinMode(echo , INPUT);
+  Serial.begin(9600);  
+  servo.attach(servoPin);
+  
   pinMode(leftForward , OUTPUT);
   pinMode(leftBackward , OUTPUT);
   pinMode(rightForward , OUTPUT);
@@ -24,56 +31,53 @@ void setup()
 
 }
 void loop() {
-  
-      
-      while(Serial.available()>0)
-      { 
-       input=Serial.read(); 
-        
-        Serial.println(input);
-      }
+  servo.write(45);      // Turn SG90 servo Left to 45 degrees
+   delay(1000);          // Wait 1 second
+   servo.write(90);      // Turn SG90 servo back to 90 degrees (center position)
+   delay(1000);          // Wait 1 second
+   servo.write(135);     // Turn SG90 servo Right to 135 degrees
+   delay(1000);          // Wait 1 second
+   servo.write(90);      // Turn SG90 servo back to 90 degrees (center position)
+   delay(1000);
 
-      
+   for(servoAngle = 0; servoAngle < 180; servoAngle++)  //move the micro servo from 0 degrees to 180 degrees
+  {                                  
+    servo.write(servoAngle);              
+    delay(50);                  
+  }
+ 
+  for(servoAngle = 180; servoAngle > 0; servoAngle--)  //now move back the micro servo from 0 degrees to 180 degrees
+  {                                
+    servo.write(servoAngle);          
+    delay(10);      
+  }
+   
+      while(Serial.available()>0){ // Checks whether data is comming from the serial port
+       input=Serial.read(); // Reads the data from the serial port
+        //read1=(char)input;
+        Serial.println(input);
+     }
    if(input==54)
    {
-     
-   do
-   {
-    digitalWrite(trig , HIGH);
-  delayMicroseconds(1000);
-  digitalWrite(trig , LOW);
-  duration = pulseIn(echo , HIGH);
-  distance = (duration/2) / 28.5 ;
-  Serial.println(distance);
  if ( distance < 50 )
   {
-    digitalWrite(leftForward , HIGH);
-    digitalWrite(leftBackward , LOW);
-    digitalWrite(rightForward , HIGH);
-    digitalWrite(rightBackward , LOW);
-    
-    delay(500);
-    input=Serial.read(); 
-  }
-  else
-  {
-    
     digitalWrite(leftForward , LOW);
     digitalWrite(leftBackward , HIGH);
     digitalWrite(rightForward , HIGH);
     digitalWrite(rightBackward , LOW);
-    input=Serial.read(); 
+    
+    delay(500);
   }
-   } while(input!=48);
-   digitalWrite(leftForward , LOW);
+  else
+  {
+    
+    digitalWrite(leftForward , HIGH);
     digitalWrite(leftBackward , LOW);
-    digitalWrite(rightForward , LOW);
+    digitalWrite(rightForward , HIGH);
     digitalWrite(rightBackward , LOW);
+  }
    }
-   
-   
-     
- else  if(input==49)
+   if(input==49)
     {
     digitalWrite(leftForward , HIGH);
     digitalWrite(leftBackward , LOW);
@@ -89,7 +93,7 @@ void loop() {
     digitalWrite(rightBackward , HIGH);
     delay(500);
   }
- else if(input==51)
+  else if(input==51)
   {
      digitalWrite(leftForward , LOW);
     digitalWrite(leftBackward , HIGH);
@@ -103,73 +107,14 @@ void loop() {
     digitalWrite(rightForward , LOW);
     digitalWrite(rightBackward , HIGH);
    }
-   else if(input==53)
+   else
    {
     digitalWrite(leftForward , LOW);
     digitalWrite(leftBackward ,LOW);
     digitalWrite(rightForward , LOW);
     digitalWrite(rightBackward , LOW);
    }
-
- else if(input=55)
- {
-  text="";
-  while (Serial.available())
-      {
-         delay(5);
-         char c = (char)Serial.read();
-         text += c;
-         Serial.println(text); 
-      }
-
-
-   if(text=="go")
- {
-   digitalWrite(leftForward , LOW);
-    digitalWrite(leftBackward , HIGH);
-    digitalWrite(rightForward , HIGH);
-    digitalWrite(rightBackward , LOW);
-    text="";
- }
-  if(text=="back")
- {
-  digitalWrite(leftForward , HIGH);
-    digitalWrite(leftBackward ,LOW);
-    digitalWrite(rightForward , LOW);
-    digitalWrite(rightBackward , HIGH);
-    text="";
- }
- if(text=="right")
- {
-  digitalWrite(leftForward , HIGH);
-    digitalWrite(leftBackward , LOW);
-    digitalWrite(rightForward , HIGH);
-    digitalWrite(rightBackward , LOW);
-    text="";
- }
- if(text=="left")
- {
-  digitalWrite(leftForward , LOW);
-    digitalWrite(leftBackward ,HIGH);
-    digitalWrite(rightForward , LOW);
-    digitalWrite(rightBackward , HIGH);
-    text="";
- }
- if(text=="stop")
- {
-  digitalWrite(leftForward , LOW);
-    digitalWrite(leftBackward ,LOW);
-    digitalWrite(rightForward , LOW);
-    digitalWrite(rightBackward , LOW);
-    text="";
- }
-
-}
-}
-
-
-  
-   
+   }
    
 
    
